@@ -1,19 +1,23 @@
-from detect.detect import det_escape,det_nickname
-from image.init_cam import init_cam
+from image.Camera import Camera
+from detect.Detect import Detect
+import time
+detect = Detect()
+camera = Camera()
 
 try:
-    camera = init_cam()
     while True:
-        # 1. 获取完整大图
+        frame = camera.grab()
+        if frame is not None:
+            # 检测撞墙
+            obs_status = detect.det_obs(frame)
 
-
-        # while True:
-        frame = camera.get_latest_frame()
-        # ================= 核心操作 =================
-        battle = det_nickname(frame)
-        escape = det_escape(frame)
-        print(f"遇怪中: {battle}\t可逃跑: {escape}")
+            # 打印结果
+            # print(obs_status)
+            for k,v in obs_status.items():
+                if v:
+                    print(k+" ",end="")
+            print("\n++++++++")
+        # time.sleep(0.)  # 模拟移动间隔
 
 except KeyboardInterrupt:
     pass
-

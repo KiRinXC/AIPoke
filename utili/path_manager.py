@@ -31,7 +31,8 @@ def init_dir():
     folders_to_create = [
         LOG_DIR,
         DATA_DIR,
-        KEY_DIR
+        KEY_DIR,
+        TEM_DIR
     ]
 
     for folder in folders_to_create:

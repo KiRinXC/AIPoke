@@ -27,3 +27,5 @@ def adjust_window():
             window.moveTo(win_x, win_y)
             return window
     return False
+
+adjust_window()
