@@ -1,7 +1,6 @@
 from client import ClientKeyManager
 from admin import AdminKeyGenerator
-from uid import UID
-from utili.log_manager import init_logging
+from AIPoke.utili.log_manager import init_logging
 if __name__ == '__main__':
     init_logging(is_debug=True)
     admin = AdminKeyGenerator()

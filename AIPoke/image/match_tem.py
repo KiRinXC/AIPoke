@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from image.get_tem import get_tem
+from AIPoke.image.get_tem import get_tem
 
 def match_static(frame, region, template, confidence=0.85):
     """
@@ -44,7 +44,7 @@ def match_dynamic(frame, region, template, confidence=0.85):
 
 def verify_area(image_path, region, template, confidence=0.85):
     """
-    【通用验证函数】验证 frame 的特定区域是否匹配模板。
+    【通用验证函数】验证 给定图片 的特定区域是否匹配模板。
     会自动截取区域、进行二值化，并根据尺寸自动选择最快的匹配算法。
 
     参数:
@@ -64,3 +64,21 @@ def verify_area(image_path, region, template, confidence=0.85):
     res = cv2.matchTemplate(binary_roi, template, cv2.TM_CCOEFF_NORMED)
     _, max_val, _, _ = cv2.minMaxLoc(res)
     return max_val >= confidence
+
+def verify_match(curr_roi, old_roi, threshold=2.0):
+    """
+    验证 两个frame 是否匹配
+    :param curr_roi:
+    :param old_roi:
+    :param threshold:
+    :return:
+    """
+    # [关键] 转换为 int32 进行计算，防止 uint8 溢出
+    # 计算 绝对差值 的 平均值
+    # 逻辑：|当前 - 过去| -> 求和 -> 除以像素数
+    diff_score = np.mean(np.abs(curr_roi.astype(int) - old_roi.astype(int)))
+
+    # 如果差异很小 (score < threshold)，说明画面没变
+    return diff_score < threshold
+
+

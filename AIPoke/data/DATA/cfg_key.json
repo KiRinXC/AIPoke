@@ -1,0 +1,15 @@
+{
+  "min": 0.02,
+  "max": 0.08,
+  "shuffle_prob": 0.05,
+  "right" : "d",
+  "left" : "a",
+  "up" : "w",
+  "down" : "s",
+  "A": "q",
+  "B": "space",
+  "fish_rod": "3",
+  "perfume": "4",
+  "spray": "5",
+  "sweet_scent": "8"
+}

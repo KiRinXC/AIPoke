@@ -1,0 +1,11 @@
+{
+  "min": 0.05,
+  "max": 0.2,
+  "shake_drift_prob": 0.5,
+  "random_drift_prob": 0.9,
+  "escape": [395,635,182,35],
+  "perfume": [824, 11, 30, 30],
+  "spray": [871, 11, 30, 30],
+  "sweet_scent": [1012, 11, 30, 30],
+  "fish_rod": [777, 11, 30, 30]
+}

@@ -3,7 +3,7 @@ import os
 import sys
 from logging.handlers import TimedRotatingFileHandler
 
-from utili.path_manager import LOG_DIR
+from AIPoke.utili.path_manager import LOG_DIR
 
 
 def init_logging(is_debug=False):
@@ -22,7 +22,7 @@ def init_logging(is_debug=False):
         return logger
 
     # 设置默认级别为 INFO
-    logger.setLevel(logging.DEBUG if is_debug else logging.INFO)
+    logger.setLevel(logging.INFO)
 
     # 3. 定义日志格式 (满足你想要的时间+等级)
     # 格式示例: 2023-10-27 10:30:01 - [INFO] - [MainThread] - 任务启动成功

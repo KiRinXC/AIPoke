@@ -4,10 +4,7 @@ import pydirectinput
 import numpy as np
 import threading
 import logging
-pydirectinput.PAUSE = 0
-pydirectinput.FAILSAFE = False
-
-# 基础设置
+from AIPoke.utili.data_manager import CFG_KEY
 pydirectinput.PAUSE = 0
 pydirectinput.FAILSAFE = False
 
@@ -15,10 +12,11 @@ pydirectinput.FAILSAFE = False
 class Walker:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.right = 'd'
-        self.left = 'a'
-        self.up = 'w'
-        self.down = 's'
+        self.key = CFG_KEY
+        self.right = self.key["right"]
+        self.left = self.key["left"]
+        self.up = self.key["up"]
+        self.down = self.key["down"]
 
         self.opposites = {
             self.left: self.right,

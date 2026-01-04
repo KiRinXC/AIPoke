@@ -3,7 +3,7 @@ import base64
 import json
 import os
 import datetime
-from utili.path_manager import KEY_DIR
+from AIPoke.utili.path_manager import KEY_DIR
 
 
 class AdminKeyGenerator:
@@ -54,7 +54,7 @@ class AdminKeyGenerator:
 if __name__ == "__main__":
     # 实例化
     admin = AdminKeyGenerator()
-    from key.uid import UID
+    from AIPoke.key.uid import UID
     # 打印公钥，你需要把这个公钥复制到 license_validator.py 里！
     uid = UID().get_uid()
     print(uid)

@@ -6,8 +6,8 @@ import logging
 import base64
 import datetime
 import uuid
-from utili.path_manager import KEY_DIR
-from key.uid import UID
+from AIPoke.utili.path_manager import KEY_DIR
+from AIPoke.key.uid import UID
 
 class ClientKeyManager:
     def __init__(self):
