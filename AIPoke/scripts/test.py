@@ -7,6 +7,7 @@ from AIPoke.detect.Detect import Detect
 from AIPoke.utili.reminder import Reminder
 from AIPoke.utili.log_manager import init_logging
 
+
 STATE_MAP = {
     0b000: '过场动画',
     0b100: '脱战',

@@ -45,8 +45,10 @@ def init_dir():
 
 # 预定义一些常用路径，供其他模块直接调用
 ROOT_DIR = get_root()
+
 LOG_DIR = os.path.join(ROOT_DIR, "LOGS")
 DATA_DIR = os.path.join(ROOT_DIR, "DATA")
 KEY_DIR = os.path.join(ROOT_DIR, "KEY")
 TEM_DIR = os.path.join(ROOT_DIR, "TEM")
 ASSET_DIR = os.path.join(ROOT_DIR, "ASSET")
+init_dir()

@@ -6,8 +6,7 @@ from AIPoke.actor.Random import Random
 from AIPoke.utili.data_manager import RIO_MOUSE
 # ================= 全局配置 =================
 pydirectinput.PAUSE = 0.0
-pydirectinput.FAILSAFE = True
-
+pydirectinput.FAILSAFE = False
 
 class Mouse:
     def __init__(self):
