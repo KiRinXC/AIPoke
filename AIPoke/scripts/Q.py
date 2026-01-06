@@ -22,8 +22,8 @@ if __name__ == '__main__':
     init_logging(is_debug=True)
     camera = Camera()
     detector = Detect()
-    keyoptions = AOptions()
-    keybar = ABar()
+    options = AOptions()
+    bar = ABar()
     reminder = Reminder()
     time.sleep(1)
     q = deque([0] * QUEUE_LEN, maxlen=QUEUE_LEN)   # 预填 0，保证一开始就满
@@ -39,17 +39,17 @@ if __name__ == '__main__':
             if key == 0b000:
                 pass
             elif key == 0b100:
-                keybar.sweet_scent()
+                bar.sweet_scent()
                 time.sleep(9)
             elif key == 0b010:
-                keyoptions.escape()
+                options.escape()
                 time.sleep(1)
             elif key == 0b001:
                     print("疑似出闪")
             else:
                 reminder.send_alert_remind()
                 reminder.screen_shot(frame)
-                print("游戏异常")
+                print(f"key={key:0b}游戏异常")
                 q.clear()
                 exit()
 

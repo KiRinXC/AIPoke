@@ -15,7 +15,9 @@ class Detect:
         self.rio = RIO_DET
 
     def det_nickname(self,frame):
-        return has_white_pix(frame,self.rio["nickname"])
+        rio_1 = has_white_pix(frame, self.rio["nickname"][0]) # 对应丰源关都
+        rio_2= has_white_pix(frame, self.rio["nickname"][1])  # 对应合众
+        return rio_1 or rio_2
 
     def det_escape(self,frame):
         return match_static(frame,self.rio["escape"],tem_dict["escape"])

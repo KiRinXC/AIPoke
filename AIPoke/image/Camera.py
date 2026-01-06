@@ -9,3 +9,21 @@ class Camera(object):
     def grab(self):
         frame = self.camera.get_latest_frame()
         return frame
+
+# import cv2
+# camera = Camera()
+# frame = camera.grab()
+# # 要框的区域
+# x, y, w, h = 570, 409, 20, 10
+# # cv2.imwrite("test1.png", frame)
+# # ① 只截子图w
+# roi = frame[y:y+h, x:x+w]
+#
+# # ② 在原图上画框
+# cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
+#
+# # 看看效果
+# cv2.imshow("frame", frame)
+# # cv2.imshow("roi", roi)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()

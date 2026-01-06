@@ -21,7 +21,6 @@ class Mouse:
 
     def click(self,rio,button='left'):
         x, y = self.rand.gen_loc(rio)
-        time.sleep(self.rand.hangup(0.0, 0.5, 0.04))
         self.point.move_to(x,y)
         # 鼠标按下
         pydirectinput.mouseDown(x=x, y=y, button=button, _pause=False)
@@ -33,9 +32,8 @@ class Mouse:
         pydirectinput.mouseUp(button=button, _pause=False)
         # 鼠标发生偏移
         self.point.shake_drift(prob=self.shake_drift_prob)
+        time.sleep(self.rand.gauss(0,4.0,0.5))
         self.point.random_drift(prob=self.random_drift_prob)
-
-
 
 class MOptions(Mouse):
     def __init__(self):

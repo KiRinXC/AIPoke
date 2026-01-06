@@ -2,6 +2,7 @@ import time
 import pydirectinput
 import random
 
+
 from AIPoke.utili.data_manager import CFG_KEY
 from AIPoke.actor.Random import Random
 pydirectinput.PAUSE = 0
@@ -21,21 +22,21 @@ class Key:
         self.A = self.cfg['A']
         self.B = self.cfg['B']
 
-
     def press(self, key):
         """
         模拟：按下 -> 随机持续 -> 松开
         """
-        time.sleep(self.rand.hangup(0.0,0.5,0.04))
         pydirectinput.keyDown(key)
         time.sleep(self.rand.gauss(0.03,0.1))
         pydirectinput.keyUp(key)
+        time.sleep(self.rand.gauss(0.0, 0.2, 0.04))
 
     def press_with_shuffle(self, order):
-        """随机打乱按键"""
+        # 创建一个副本进行操作，不影响类的属性
+        current_order = list(order)
         if random.random() < self.shuffle_prob:
-            order[0], order[1] = order[1], order[0]  # 交换
-        for k in order:
+            random.shuffle(current_order)  # 或者手动交换
+        for k in current_order:
             self.press(k)
 
 
@@ -44,7 +45,7 @@ class KOptions(Key):
     def __init__(self):
         super().__init__()
         self.escape = [self.right,self.down]
-        
+
     def escape_press(self):
         self.press_with_shuffle(self.escape)
         self.press(self.B)
