@@ -14,10 +14,14 @@ class Camera(object):
 # camera = Camera()
 # frame = camera.grab()
 # # 要框的区域
-# x, y, w, h = 570, 409, 20, 10
-# # cv2.imwrite("test1.png", frame)
+# x, y, w, h = 164,158,8,8
+# # cv2.imwrite("test7.png", frame)
+#
 # # ① 只截子图w
 # roi = frame[y:y+h, x:x+w]
+# from get_tem import get_tem
+# tem = get_tem(frame,[517,340,19,18])
+# cv2.imwrite("pokedex.png", tem)
 #
 # # ② 在原图上画框
 # cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)

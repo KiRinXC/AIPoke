@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from AIPoke.image.get_tem import get_tem
 
-def match_static(frame, region, template, confidence=0.85):
+def match_static(frame, region, template, confidence=0.95):
     """
     【静态极速对比】
     适用场景：Region的大小和Template的大小完全一致（1:1）。
@@ -23,7 +23,7 @@ def match_static(frame, region, template, confidence=0.85):
     # 相似度 = 1 - (不一样的点 / 总点数)
     total_pixels = template.size # 高 x 宽
     match_rate = 1 - (non_zero_count / total_pixels)
-
+    # print("match_rate:", match_rate)
     return match_rate >= confidence
 
 

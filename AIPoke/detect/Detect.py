@@ -1,5 +1,5 @@
 from AIPoke.image.color import has_white_pix,all_black_pix
-from AIPoke.image.match_tem import match_static, verify_match
+from AIPoke.image.match_tem import match_static, verify_match, match_dynamic
 from AIPoke.utili.tem_manager import load_all_templates
 from AIPoke.utili.path_manager import TEM_DIR
 from AIPoke.utili.data_manager import RIO_DET
@@ -30,6 +30,45 @@ class Detect:
         lab1 = all_black_pix(frame,self.rio["pop_win"],threshold=5)  # 画面全黑
         lab2 =  all_black_pix(frame,self.rio["pop_win"],threshold=20) # 出现弹窗
         return lab1 ^ lab2
+
+    def det_hp_bar(self,frame):
+        """检测血量条是否出现"""
+        return match_dynamic(frame,self.rio["hp_bar"],tem_dict["hp_bar"])
+
+    def det_poke_ditto(self,frame):
+        """检测是否是百变怪"""
+        return match_dynamic(frame,self.rio["poke_info"],tem_dict["poke_ditto"])
+
+    def det_zzz(self,frame):
+        """检测是否睡着"""
+        return match_dynamic(frame,self.rio["zzz"],tem_dict["zzz"])
+
+    def det_pokedex(self,frame):
+        """检测是否出现捕捉成功后的图鉴"""
+        return match_static(frame,self.rio["pokedex"],tem_dict["pokedex"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def det_obs(self, frame):
         """
