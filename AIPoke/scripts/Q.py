@@ -31,7 +31,7 @@ class Q(AIPoke):
 
     def run(self):
         """主循环"""
-        while True:
+        while not self.quit_event.is_set():
             frame = self.camera.grab()
             state = self.update_state(frame)
 

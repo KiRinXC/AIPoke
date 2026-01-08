@@ -1,3 +1,5 @@
+from collections import deque
+
 from AIPoke.image.color import has_white_pix,all_black_pix
 from AIPoke.image.match_tem import match_static, verify_match, match_dynamic
 from AIPoke.utili.tem_manager import load_all_templates
@@ -13,6 +15,10 @@ class Detect:
         self.old_frame = None
         self.static_threshold = 2.0 # 撞墙
         self.rio = RIO_DET
+        self.obs_queue_len = 5
+        self.obs_queues = {
+            k: deque( [False] * self.obs_queue_len,maxlen=self.obs_queue_len) for k in self.rio["obs"]
+        }
 
     def det_nickname(self,frame):
         rio_1 = has_white_pix(frame, self.rio["nickname"][0]) # 对应丰源关都
@@ -48,32 +54,11 @@ class Detect:
         return match_static(frame,self.rio["pokedex"],tem_dict["pokedex"])
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def det_obs(self, frame):
+    def det_obs(self, frame,directions):
         """
         检测障碍物
         :param frame: 当前帧 (NumPy数组)
+        :param directions: 移动方向
         :return: 字典, 例如 {'obs_left': True, 'obs_right': False}
                  True 表示该方向画面静止（可能撞墙），False 表示画面在变（通畅）
         """
@@ -87,17 +72,36 @@ class Detect:
 
         # 2. 遍历四个区域进行对比
         for name, (x, y, w, h) in self.rio["obs"].items():
+            if name not in directions:
+                continue
             # --- 核心 NumPy 对比逻辑 ---
 
             # 切片获取当前帧区域和上一帧区域
             curr_roi = frame[y:y + h, x:x + w]
             old_roi = self.old_frame[y:y + h, x:x + w]
-            result[name] = verify_match(curr_roi, old_roi)
+            is_static_now = verify_match(curr_roi, old_roi)
+            self.obs_queues[name].append(is_static_now)
+
+            if all(self.obs_queues[name]):
+                result[name] = True
+                return True
 
         #更新旧帧，供下一次对比使用
         self.old_frame = frame.copy()
+        return False
 
-        return result
+
+
+#
+# detect = Detect()
+# from AIPoke.image.Camera import Camera
+# import time
+# camera = Camera()
+# while True:
+#     frame = camera.grab()
+#     # print(detect.det_obs(frame))
+#     print(detect.det_obs(frame,["left","right"]))
+#     time.sleep(0.1)
 
 
 

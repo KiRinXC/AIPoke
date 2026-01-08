@@ -40,15 +40,32 @@ class Key:
             self.press(k)
 
 
+
 class KOptions(Key):
     """对战界面的四个选项"""
     def __init__(self):
         super().__init__()
+        self.battle = self.A
+        self.bag = self.right
+        self.pokemon = self.down
         self.escape = [self.right,self.down]
+
+    def battle_press(self):
+        self.press(self.battle)
+
+    def bag_press(self):
+        self.press(self.bag)
+        self.press(self.A)
+
+    def pokemon_press(self):
+        self.press(self.pokemon)
+        self.press(self.A)
 
     def escape_press(self):
         self.press_with_shuffle(self.escape)
         self.press(self.B)
+
+
 
 class KBar(Key):
     def __init__(self):
@@ -57,6 +74,7 @@ class KBar(Key):
         self.spray = self.cfg['spray']
         self.sweet_scent = self.cfg['sweet_scent']
         self.fish_rod = self.cfg['fish_rod']
+        self.pokeball = self.cfg['pokeball']
 
     def perfume_press(self):
         self.press(self.perfume)
@@ -69,6 +87,28 @@ class KBar(Key):
 
     def fish_rod_press(self):
         self.press(self.fish_rod)
+
+    def pokeball_press(self):
+        self.press(self.pokeball)
+
+class KInfoWin(Key):
+    def __init__(self):
+        super().__init__()
+
+    def iv_press(self):
+        offset = random.choices([2,3,4],weights=[0.2,0.7,0.1])[0]
+        for i in range(offset):
+            self.press(self.right)
+        if offset == 2:
+            self.press(self.right)
+        elif offset == 3:
+            pass
+        else:
+            self.press(self.left)
+
+    def pokedex_cancel_press(self):
+        self.press(self.B)
+
 
 
 

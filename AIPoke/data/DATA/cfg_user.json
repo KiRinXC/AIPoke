@@ -5,5 +5,7 @@
   "shiny_code":"tHSiLK0",
   "alert_code":"tHSiLK0",
   "options_prob": 0.9,
-  "bar_prob": 0.7
+  "bar_prob": 0.7,
+  "popwin_prob": 0.6,
+  "skip_iv_prob": 0.1
 }

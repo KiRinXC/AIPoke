@@ -38,10 +38,24 @@ class Mouse:
 class MOptions(Mouse):
     def __init__(self):
         super().__init__()
+        self.battle = self.rio["battle"]
+        self.bag = self.rio["bag"]
+        self.pokemon = self.rio["pokemon"]
         self.escape = self.rio["escape"]
+
+    def battle_click(self):
+        self.click(self.battle)
+
+    def bag_click(self):
+        self.click(self.bag)
+
+    def pokemon_click(self):
+        self.click(self.pokemon)
 
     def escape_click(self):
         self.click(self.escape)
+
+
 
 class MBar(Mouse):
     def __init__(self):
@@ -50,6 +64,8 @@ class MBar(Mouse):
         self.spray = self.rio['spray']
         self.sweet_scent = self.rio['sweet_scent']
         self.fish_rod = self.rio['fish_rod']
+
+        self.pokeball = self.rio['pokeball']
 
     def perfume_click(self):
         self.click(self.perfume)
@@ -63,5 +79,18 @@ class MBar(Mouse):
     def fish_rod_click(self):
         self.click(self.fish_rod)
 
+    def pokeball_click(self):
+        self.click(self.pokeball)
 
+class MInfoWin(Mouse):
+    def __init__(self):
+        super().__init__()
+        self.iv = self.rio["iv"]
+        self.pokedex_cancel = self.rio["pokedex_cancel"]
+
+    def iv_click(self):
+        self.click(self.iv)
+
+    def pokedex_cancel_click(self):
+        self.click(self.pokedex_cancel)
 

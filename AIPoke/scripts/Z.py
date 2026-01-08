@@ -1,7 +1,9 @@
 import time
 from enum import Enum,IntEnum
+import threading
 
 from AIPoke.scripts.A import AIPoke
+from AIPoke.move.move import Walker
 from AIPoke.utili.log_manager import init_logging
 
 # --- 状态位掩码定义---
@@ -15,12 +17,8 @@ class StateMap(IntEnum):
 
 # 血条处的信息
 class INFO(IntEnum):
-    NOTHING = 0b000  # 啥也没/群怪
-    HP_BAR  = 0b001  # 有血条
-    DITTO   = 0b010  # 是目标精灵
-    ZZZ     = 0b100  # 睡着了
-    CATCH   = 0b111  # 丢球
-    SKILL   = 0b011  # 需要睡眠
+    SKILL   = 0b011  # 是目标精灵，但是未睡眠     需要催眠/磨血
+    CATCH   = 0b111  # 是目标精灵，且睡着了       直接捕捉
 
 
 # --- 内部捕捉阶段记录 ---
@@ -35,6 +33,11 @@ class Z(AIPoke):
     def __init__(self):
         super().__init__()
         self.capture_stage = CaptureStage.MEET  # 内部状态：记录当前抓到哪一步了
+        self.walker = Walker()
+        self.move_event = threading.Event()
+        self.move_event.clear()
+        self.obs_event = threading.Event()
+        self.obs_event.clear()
 
     def update_state(self, frame):
         """返回当前画面的状态码"""
@@ -59,27 +62,21 @@ class Z(AIPoke):
 
         return info
 
-    def run(self):
-        while True:
+    def detect(self):
+        while not self.quit_event.is_set():
             # 1. 获取所有传感器数据
             frame = self.camera.grab()
             state = self.update_state(frame)
             info = self.update_info(frame)
-
-            # 3. 核心决策逻辑 (Reactive Logic)
-
-            # --- 优先级 1: 异常与成功处理 ---
-            # if is_pop_win:
-            #     # 检测到弹窗 -> 报警
-            #     self.action_alert()
-            #     continue
+            is_obs = self.detector.det_obs(frame,["left","right"])
 
             if state == StateMap.PASS_ANIM:
-                # 检测到图鉴 -> 捕捉成功
-                print("点取消")
+                self.move_event.clear()
 
             elif state == StateMap.NICKNAME:
-                print("人物移动")
+                self.move_event.set()
+                self.obs_event.set() if is_obs else self.obs_event.clear()
+                # print("人物移动")
 
             # --- 优先级 3: 战斗操作状态 (必须看到 escape 按钮才操作) ---
             elif state == StateMap.ESCAPE:
@@ -90,91 +87,96 @@ class Z(AIPoke):
                 self.logger.warning("疑似闪光")
                 if self.check_shiny(StateMap.POP_WIN):
                     self.shiny_reminder()
+                    self.quit_event.set()
 
             elif state == StateMap.POKEDEX:
-                print("图鉴，点取消")
+                self.capture_stage = CaptureStage.MEET
+                self.infowin.iv()
+                self.infowin.pokedex_cancel()
 
             else:
                 self.alert_reminder()
-
+                self.quit_event.set()
             time.sleep(0.1)
 
-    def catch(self, info,poke_flags, is_hp_bar, is_ditto, is_zzz):
+    def catch(self, info):
         """
         处理战斗回合的逻辑
         不需要等待，只做当前最应该做的一个动作
         """
-        # 情况 A: 群怪 (没有血条) 或 非百变怪
-        # 逻辑：(没血条) 或 (有血条但不是百变怪) -> 逃跑
-        if info == INFO.NOTHING or info == INFO:
-            print(f"[{bin(poke_flags)}] 非目标/群怪 -> 点击逃跑")
-            self.click_escape()
-            self.capture_stage = CaptureStage.MEET  # 重置状态
-            return
 
-        # 情况 B: 是百变怪 (有血条 且 是百变怪)
-        if is_hp_bar and is_ditto:
-            # 根据内部记录的阶段，决定出什么招
-
+        # 百变怪没睡着
+        if info == INFO.SKILL:
             # 阶段 1: 刚见面 -> 打一技能 (修血)
             if self.capture_stage == CaptureStage.MEET:
-                print(f"[{bin(poke_flags)}] 发现百变怪 -> 使用技能1 (修血)")
-                self.use_skill_1()
+                self.options.skill_1()
                 self.capture_stage = CaptureStage.HP_LOWERED  # 状态流转
+                time.sleep(5)
                 return
-
             # 阶段 2: 已经修血 -> 打二技能 (催眠)
-            if self.capture_stage == CaptureStage.HP_LOWERED:
-                print(f"[{bin(poke_flags)}] 血量已压低 -> 使用技能2 (催眠)")
-                self.use_skill_2()
-                self.capture_stage = CaptureStage.SLEEPING  # 状态流转
+            elif self.capture_stage == CaptureStage.HP_LOWERED:
+                self.options.skill_2()
+                self.capture_stage = CaptureStage.SLEEPING
                 return
+            else:
+                self.logger.error(f"出现未知路径: {self.capture_stage}")
+                self.alert_reminder()
+                self.quit_event.set()
 
-            # 阶段 3: 已经催眠过 -> 检查是否睡着 -> 扔球 或 补催眠
-            if self.capture_stage == CaptureStage.SLEEPING:
-                if is_zzz:
-                    print(f"[{bin(poke_flags)}] 目标睡眠中 -> 扔球")
-                    self.throw_ball()
-                    # 扔球后状态不变，如果没抓到下一轮还会进这里
-                else:
-                    print(f"[{bin(poke_flags)}] 目标醒了/未睡着 -> 补技能2")
-                    self.use_skill_2()
-                return
+        elif info == INFO.CATCH:
+            # 阶段 3: 已经修血且睡眠 -> 扔球
+            self.bar.pokeball()
+            self.capture_stage = CaptureStage.HP_LOWERED  # 重置状态
+            return
+        else:
+            self.options.escape()
+            return
 
-    # --- 动作封装 (模拟点击) ---
-    def action_roaming(self):
-        # print("正在寻找宝可梦...")
-        self.capture_stage = CaptureStage.MEET  # 确保重置战斗状态
-        # move_character() # 这里调用你的移动函数
+    def move(self):
+        """移动线程"""
+        while not self.quit_event.is_set():
+            # 在尝试移动前，先阻塞等待！
+            # 如果 move_event 是 clear 状态（遇怪中），线程会在这里彻底挂起（休眠），
+            # CPU 占用率为 0%，直到 detect 线程再次 set 它。
+            self.move_event.wait()
 
-    def action_success(self):
-        print("!!! 捕捉成功 (Pokedex) !!!")
-        # press_space() # 按空格退出图鉴
-        self.capture_stage = CaptureStage.MEET  # 重置
-        time.sleep(1)  # 稍作防抖
+            # 只有允许移动时，才进入具体的移动逻辑
+            if not self.quit_event.is_set():
+                self.walker.patrol_x(self.move_event, self.obs_event, [5, 20])
 
-    def action_alert(self):
-        print("!!! 出现弹窗异常 !!!")
-        # send_message()
+    def run(self):
+        """主入口：启动双线程"""
+        # 创建线程
+        t_detect = threading.Thread(target=self.detect, name="Thread-Detect")
+        t_move = threading.Thread(target=self.move, name="Thread-Move")
 
-    def click_escape(self):
-        # 点击屏幕上的逃跑按钮
-        pass
+        # 设置为守护线程 (Daemon)
+        # 这样当你强制关闭主程序（或 Ctrl+C）时，子线程会自动随之关闭，不会卡在后台
+        t_detect.daemon = True
+        t_move.daemon = True
 
-    def use_skill_1(self):
-        # 点击技能1
-        pass
+        # 启动
+        t_detect.start()
+        t_move.start()
+        # 主线程阻塞等待
+        try:
+            while not self.quit_event.is_set():
+                # 每秒检查一次子线程是否还活着
+                if not t_detect.is_alive() or not t_move.is_alive():
+                    self.logger.error("检测到子线程意外退出，脚本终止")
+                    self.quit_event.set()
+                    break
+                time.sleep(1)
+        except KeyboardInterrupt:
+            self.logger.info("用户手动停止")
+            self.quit_event.set()
 
-    def use_skill_2(self):
-        # 点击技能2
-        pass
-
-    def throw_ball(self):
-        # 点击背包 -> 球 -> 扔
-        pass
-
+        # 等待子线程结束
+        t_detect.join()
+        t_move.join()
 
 if __name__ == '__main__':
     init_logging(is_debug=True)
     bot = Z()
+    time.sleep(2)
     bot.run()
