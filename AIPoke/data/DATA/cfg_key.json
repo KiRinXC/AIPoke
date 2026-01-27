@@ -12,5 +12,6 @@
   "perfume": "4",
   "spray": "5",
   "sweet_scent": "8",
-  "pokeball":"1"
+  "pokeball":"1",
+  "chat_win_prob":0.05
 }

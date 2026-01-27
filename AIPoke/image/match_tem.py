@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from AIPoke.image.get_tem import get_tem
 
-def match_static(frame, region, template, confidence=0.95):
+def match_static(frame, region, template, threshold=240,confidence=0.95):
     """
     【静态极速对比】
     适用场景：Region的大小和Template的大小完全一致（1:1）。
@@ -10,7 +10,7 @@ def match_static(frame, region, template, confidence=0.95):
     """
     # 1. 获取二值化的 ROI
     # 假设 get_tem 返回的是 uint8 格式的二值图 (0 和 255)
-    binary_roi = get_tem(frame, region)
+    binary_roi = get_tem(frame, region,threshold)
 
     # 2. 核心算法：异或运算 (Bitwise XOR)
     # 原理：相同为0，不同为255 (或1)
@@ -27,13 +27,13 @@ def match_static(frame, region, template, confidence=0.95):
     return match_rate >= confidence
 
 
-def match_dynamic(frame, region, template, confidence=0.85):
+def match_dynamic(frame, region, template, threshold=240,confidence=0.85):
     """
     【动态搜索对比】
     适用场景：Region 比 Template 大，需要在 Region 里找 Template。
     原理：标准模板匹配 (Convolution)。
     """
-    binary_roi = get_tem(frame, region)
+    binary_roi = get_tem(frame, region,threshold)
 
     # 核心算法：标准模板匹配
     res = cv2.matchTemplate(binary_roi, template, cv2.TM_CCOEFF_NORMED)

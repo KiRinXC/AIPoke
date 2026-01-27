@@ -16,7 +16,7 @@ class Actor:
         self.rand = Random()
         self.options_prob = self.cfg['options_prob']
         self.bar_prob = self.cfg['bar_prob']
-        self.popwin_prob = self.cfg['popwin_prob']
+        self.pop_win_prob = self.cfg['pop_win_prob']
         self.skip_iv_prob = self.cfg['skip_iv_prob']
 
     @classmethod
@@ -56,7 +56,7 @@ class Actor:
         def wrapper(self, *args, **kw):
             ret = fn(self, *args, **kw)   # 先执行原函数
             # 停留 0.5–2 秒，内部写死
-            delay = self.rand.gauss(0.5,2.0,1.0)
+            delay = self.rand.gauss(0.05,0.4,0.2)
             time.sleep(delay)
             return ret
         return wrapper
@@ -150,10 +150,14 @@ class AInfoWin(Actor):
     @Actor.hangup
     @Actor.view
     def iv(self):
-        self.select(self.K.iv_press, self.M.iv_click, "查看个体值", self.popwin_prob)()
+        self.select(self.K.iv_press, self.M.iv_click, "查看个体值", self.pop_win_prob)()
 
     @Actor.hangup
     def pokedex_cancel(self):
-        self.select(self.K.pokedex_cancel_press, self.M.pokedex_cancel_click, "关闭图鉴", self.popwin_prob)()
+        self.M.random_drift_prob = 0.0
+        self.select(self.K.pokedex_cancel_press, self.M.pokedex_cancel_click, "关闭图鉴", self.pop_win_prob)()
+        self.M.random_drift_prob = self.M.rio["random_drift_prob"]
 
-
+    @Actor.hangup
+    def chat_win(self):
+        self.select(self.K.chat_win_press, self.M.chat_win_click,"对话", self.pop_win_prob)()

@@ -14,7 +14,6 @@ class Key:
         self.min = self.cfg['min']  # 按键最短时间
         self.max = self.cfg['max']  # 按键最长时间
         self.shuffle_prob = self.cfg['shuffle_prob']   # 打乱按键顺序的概率
-
         self.right = self.cfg['right']
         self.left = self.cfg['left']
         self.up = self.cfg['up']
@@ -29,7 +28,7 @@ class Key:
         pydirectinput.keyDown(key)
         time.sleep(self.rand.gauss(0.03,0.1))
         pydirectinput.keyUp(key)
-        time.sleep(self.rand.gauss(0.0, 0.2, 0.04))
+        time.sleep(self.rand.gauss(0.0, 0.2, 0.01))
 
     def press_with_shuffle(self, order):
         # 创建一个副本进行操作，不影响类的属性
@@ -94,6 +93,13 @@ class KBar(Key):
 class KInfoWin(Key):
     def __init__(self):
         super().__init__()
+        # 使用A键跳过对话
+        self.chat_win_prob = self.cfg['chat_win_prob']
+        if random.random() < self.chat_win_prob:
+            self.chat_win = self.A
+        else:
+            self.chat_win = self.B
+
 
     def iv_press(self):
         offset = random.choices([2,3,4],weights=[0.2,0.7,0.1])[0]
@@ -108,6 +114,9 @@ class KInfoWin(Key):
 
     def pokedex_cancel_press(self):
         self.press(self.B)
+
+    def chat_win_press(self):
+        self.press(self.chat_win)
 
 
 

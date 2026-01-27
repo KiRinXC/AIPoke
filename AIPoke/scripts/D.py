@@ -1,4 +1,4 @@
-"""群怪刷闪"""
+"""钓鱼"""
 import time
 from enum import IntEnum
 
@@ -8,24 +8,27 @@ from AIPoke.utili.log_manager import init_logging
 
 # --- 常量定义 ---
 class StateMap(IntEnum):
-    PASS_ANIM = 0b000  # 过场动画/等待
-    NICKNAME = 0b100  # 脱战/漫游状态 (可以看到昵称)
-    ESCAPE = 0b010  # 战斗菜单 (可以看到逃跑/Fight)
-    POP_WIN = 0b001  # 弹窗/疑似闪光
+    PASS_ANIM = 0b0000  # 过场动画/等待
+    CHAT_WIN = 0b1100   # 对话白框,必能看到昵称
+    NICKNAME = 0b0100  # 脱战/漫游状态 (可以看到昵称)
+    ESCAPE = 0b0010  # 战斗菜单 (可以看到逃跑/Fight)
+    POP_WIN = 0b0001  # 弹窗/疑似闪光
     # 组合状态（如果有）可以在此扩展
 
-class Q(AIPoke):
+class D(AIPoke):
     def __init__(self):
         super().__init__()
+        self.fishing = False
 
     def update_state(self, frame):
         """核心视觉感知层：返回当前画面的状态码"""
         is_nickname = self.detector.det_nickname(frame)
         is_escape = self.detector.det_escape(frame)
+        is_chat_win = self.detector.det_chat_win(frame)
         is_pop_win = self.detector.det_pop_win(frame)
 
         # 组合位掩码
-        state = (is_nickname << 2) | (is_escape << 1) | is_pop_win
+        state = (is_chat_win << 3) | (is_nickname << 2) | (is_escape << 1) | is_pop_win
 
         self.state_queue.append(state)
         return state
@@ -40,10 +43,15 @@ class Q(AIPoke):
             if state == StateMap.PASS_ANIM:
                 # 动画中不做任何事
                 pass
+            elif state == StateMap.CHAT_WIN:
+                self.infowin.chat_win()
 
             elif state == StateMap.NICKNAME:
-                self.bar.sweet_scent()
-                time.sleep(9)
+                if not self.fishing:
+                    self.bar.fish_rod()
+                    self.fishing = True
+                    time.sleep(1)
+                continue
 
             # 如果是战斗状态 (出现了选项框)
             elif state == StateMap.ESCAPE:
@@ -56,8 +64,9 @@ class Q(AIPoke):
                     self.shiny_reminder()
             # 异常状态
             else:
-                self.alert_reminder()
-
+                print(f"游戏异常，{state:0b}")
+                # self.alert_reminder()
+            self.fishing = False
             # 循环末尾小睡，防止过度占用 CPU
             time.sleep(0.1)
 
@@ -69,5 +78,5 @@ if __name__ == '__main__':
     time.sleep(3)
 
     # 实例化并运行
-    bot = Q()
+    bot = D()
     bot.run()

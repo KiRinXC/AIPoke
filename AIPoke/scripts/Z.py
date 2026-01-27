@@ -1,3 +1,4 @@
+"""抓百变"""
 import time
 from enum import Enum,IntEnum
 import threading
@@ -36,8 +37,14 @@ class Z(AIPoke):
         self.walker = Walker()
         self.move_event = threading.Event()
         self.move_event.clear()
-        self.obs_event = threading.Event()
-        self.obs_event.clear()
+        self.left_obs_event = threading.Event()
+        self.right_obs_event = threading.Event()
+        self.left_obs_event.clear()
+        self.right_obs_event.clear()
+        self.obs_event_dict = {
+            'left': self.left_obs_event,
+            'right': self.right_obs_event
+        }
 
     def update_state(self, frame):
         """返回当前画面的状态码"""
@@ -66,16 +73,20 @@ class Z(AIPoke):
         while not self.quit_event.is_set():
             # 1. 获取所有传感器数据
             frame = self.camera.grab()
+            is_left_obs,is_right_obs = self.detector.det_underpass_obs(frame)
+            self.left_obs_event.set() if is_left_obs else self.left_obs_event.clear()
+            self.right_obs_event.set() if is_right_obs else self.right_obs_event.clear()
             state = self.update_state(frame)
             info = self.update_info(frame)
-            is_obs = self.detector.det_obs(frame,["left","right"])
+
 
             if state == StateMap.PASS_ANIM:
                 self.move_event.clear()
 
+
             elif state == StateMap.NICKNAME:
                 self.move_event.set()
-                self.obs_event.set() if is_obs else self.obs_event.clear()
+
                 # print("人物移动")
 
             # --- 优先级 3: 战斗操作状态 (必须看到 escape 按钮才操作) ---
@@ -93,11 +104,12 @@ class Z(AIPoke):
                 self.capture_stage = CaptureStage.MEET
                 self.infowin.iv()
                 self.infowin.pokedex_cancel()
+                self.move_event.set()
 
             else:
                 self.alert_reminder()
                 self.quit_event.set()
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
     def catch(self, info):
         """
@@ -142,7 +154,8 @@ class Z(AIPoke):
 
             # 只有允许移动时，才进入具体的移动逻辑
             if not self.quit_event.is_set():
-                self.walker.patrol_x(self.move_event, self.obs_event, [5, 20])
+                self.walker.patrol_x(self.move_event, self.obs_event_dict, [0.5, 10])
+                pass
 
     def run(self):
         """主入口：启动双线程"""

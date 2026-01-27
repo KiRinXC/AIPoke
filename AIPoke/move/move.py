@@ -18,11 +18,17 @@ class Walker:
         self.up = self.key["up"]
         self.down = self.key["down"]
 
+        self.map ={
+            "left": self.left,
+            "right": self.right,
+            "up": self.up,
+            "down": self.down,
+        }
         self.opposites = {
-            self.left: self.right,
-            self.right: self.left,
-            self.up: self.down,
-            self.down: self.up
+            "left": "right",
+            "right": "left",
+            "up": "down",
+            "down": "up",
         }
 
         # 记录位置偏差 (秒)
@@ -31,66 +37,60 @@ class Walker:
         self.MIN_WALK_TIME = 0.15
 
     def patrol_x(self,move_event,obs_event,rio):
-        self.patrol(move_event,obs_event,[self.right,self.left],rio)
+        self.patrol(move_event,obs_event,["right","left"],rio)
 
     def patrol_y(self,move_event,obs_event,rio):
-        self.patrol(move_event,obs_event,[self.up,self.down],rio)
+        self.patrol(move_event,obs_event,["up","down"],rio)
 
-    def patrol(self, move_event, obs_event, direction,rio):
+    def mm(self):
+        pydirectinput.keyDown(self.left)
+        time.sleep(0.2)
+        pydirectinput.keyUp(self.left)
+
+    def patrol(self, move_event, obs_event: dict, direction, rio):
         """
-        :param move_event: 移动事件
-        :param obs_event: 撞墙事件
-        :param direction: 移动方向
-        :param rio: 随机时间范围
+        :param move_event:      全局“是否允许继续移动”事件
+        :param obs_event:       各方向撞墙事件  dict[str, threading.Event]
+        :param direction:       允许的移动方向列表
+        :param rio:             每次移动时间范围 (min, max)
         """
-
-        # 初始方向随机
-        current_dir = random.choice(direction)
-
-        # 标记上一次是否是因为"遇怪/停止"而中断的
-        # 如果是，下一次移动方向随机；如果不是，下一次反向
-        is_interrupted = False
+        current_dir = random.choice(direction)  # 初始方向
+        is_interrupted = False  # 上次是否因“遇怪”中断
 
         while move_event.is_set():
-
-            # 决定本次移动的方向
+            # 1. 选方向
             if is_interrupted:
-                # 如果上次是被打断的（比如刚打完怪），随机选一个方向开始
                 current_dir = random.choice(direction)
             else:
-                # 正常情况：往反方向走
                 current_dir = self.opposites.get(current_dir)
 
-            # 决定本次移动的时间 (均匀分布)
+            # 2. 选时长
             duration = random.uniform(rio[0], rio[1])
-
-            # 开始移动
-            pydirectinput.keyDown(current_dir)
+            self.logger.info(f"向[{current_dir}]移动{duration:.2f}秒")
+            pydirectinput.keyDown(self.map[current_dir])
             start_time = time.time()
 
             try:
-                # 循环检查 (直到时间结束)
                 while time.time() - start_time < duration:
-
-                    # check 1: 是否不允许移动了? (遇怪/脚本暂停)
+                    # 2.1 全局停止信号
                     if not move_event.is_set():
                         is_interrupted = True
                         self.logger.info("停止移动")
-                        break  # 立即跳出
-                    time.sleep(0.15)
-                    # check 2: 是否撞墙?
-                    if obs_event.is_set():
+                        break
+
+                    # 2.2 只检查当前方向是否撞墙
+                    if obs_event.get(current_dir) and obs_event[current_dir].is_set():
                         is_interrupted = False
                         self.logger.warning(f"方向[{current_dir}]->撞墙")
-                        break  # 立即跳出，换方向
-
-                    # 极短睡眠，防止死循环占用100% CPU，同时保证响应速度
-
-
+                        # obs_event[current_dir].clear()  # 清除本次信号
+                        break
+                    time.sleep(0.05)  # 适当睡眠，降低 CPU
             finally:
-                # 无论如何，第一时间松开按键
-                pydirectinput.keyUp(current_dir)
+                pydirectinput.keyUp(self.map[current_dir])
 
+# time.sleep(2)
+# waker = Walker()
+# waker.mm()
 
 #
 # # ================== 测试代码 ==================
@@ -120,3 +120,5 @@ class Walker:
 #
 #     # t.join()
 #     print("已停止。")
+
+

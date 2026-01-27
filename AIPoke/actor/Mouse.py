@@ -87,10 +87,15 @@ class MInfoWin(Mouse):
         super().__init__()
         self.iv = self.rio["iv"]
         self.pokedex_cancel = self.rio["pokedex_cancel"]
+        self.chat_win = self.rio["chat_win"]
 
     def iv_click(self):
         self.click(self.iv)
 
     def pokedex_cancel_click(self):
         self.click(self.pokedex_cancel)
+
+    def chat_win_click(self):
+        self.click(self.chat_win)
+
 
