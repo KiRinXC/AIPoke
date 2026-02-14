@@ -1,10 +1,10 @@
 {
-  "prob": 0.005,
+  "prob": 0.0001,
   "loc_sigma": 0.05,
   "AFK": [1,10,200],
   "shiny_code":"tnrfLu9",
   "alert_code":"tz9C8mT",
-  "options_prob": 0.9,
+  "options_prob": 0.99,
   "bar_prob": 0.9,
   "pop_win_prob": 0.9,
   "skip_iv_prob": 0.1

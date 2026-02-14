@@ -61,6 +61,7 @@ class Q(AIPoke):
             # 循环末尾小睡，防止过度占用 CPU
             time.sleep(0.1)
 
+
 if __name__ == '__main__':
     init_logging(is_debug=True)
 

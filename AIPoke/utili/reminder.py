@@ -28,10 +28,10 @@ class Reminder:
         request.urlopen("http://miaotixing.com/trigger?" + parse.urlencode({"id": self.shiny_code, "text": self.get_info()}))
         self.logger.info("---已发送出闪喵提醒---")
 
-    def send_alert_remind(self):
+    def send_alert_remind(self,text="游戏异常,需要自检"):
 
         # 再发喵提醒
-        request.urlopen("http://miaotixing.com/trigger?" + parse.urlencode({"id": self.alert_code, "text": "游戏异常,需要自检"}))
+        request.urlopen("http://miaotixing.com/trigger?" + parse.urlencode({"id": self.alert_code, "text": text}))
         self.logger.error("---已发送异常喵提醒---")
 
     def screen_shot(self,frame):
