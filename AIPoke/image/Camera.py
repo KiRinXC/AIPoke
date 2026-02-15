@@ -10,7 +10,7 @@ class Camera(object):
         frame = self.camera.get_latest_frame()
         return frame
 
-# import cv2
+import cv2
 # camera = Camera()
 # frame = camera.grab()
 # # 要框的区域

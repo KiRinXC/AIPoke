@@ -3,9 +3,11 @@ import random
 import functools
 import time
 
+from flet.controls.material import switch
+from pywin.dialogs.ideoptions import buttonControlMap
 
-from AIPoke.actor.Key import KOptions, KBar, KInfoWin
-from AIPoke.actor.Mouse import MOptions, MBar, MInfoWin
+from AIPoke.actor.Key import KOptions, KBar, KInfoWin, KBox
+from AIPoke.actor.Mouse import MOptions, MBar, MInfoWin, MBox
 from AIPoke.utili.data_manager import CFG_USER
 from AIPoke.actor.Random import Random
 
@@ -18,6 +20,8 @@ class Actor:
         self.bar_prob = self.cfg['bar_prob']
         self.pop_win_prob = self.cfg['pop_win_prob']
         self.skip_iv_prob = self.cfg['skip_iv_prob']
+        self.hatch_prob = self.cfg['hatch_prob']
+        self.confirm_prob = self.cfg['confirm_prob']
 
     @classmethod
     def hangup(cls, fn):
@@ -161,3 +165,50 @@ class AInfoWin(Actor):
     @Actor.hangup
     def chat_win(self):
         self.select(self.K.chat_win_press, self.M.chat_win_click,"对话", self.pop_win_prob)()
+
+    @Actor.hangup
+    def open_chat(self):
+        self.K.press(self.K.A)
+
+
+class ABox(Actor):
+    def __init__(self):
+        super().__init__()
+        self.K = KBox()
+        self.M = MBox()
+
+    def K_hatch(self,count,switch,button = "left"):
+        self.M.select_pokemon_click(count, switch, button)
+        self.K.select_hatch_press()
+
+    def M_hatch(self,count,switch,button = "right"):
+        self.M.select_pokemon_click(count, switch, button)
+        self.M.select_hatch_click()
+
+    @Actor.hangup
+    def hatch_0(self,count):
+        self.select(self.K_hatch,self.M_hatch,"选中上栏精灵",self.hatch_prob)(count,0)
+
+    @Actor.hangup
+    def hatch_1(self,count):
+        self.select(self.K_hatch,self.M_hatch,"选中下栏精灵",self.hatch_prob)(count,1)
+
+
+    @Actor.hangup
+    def select_parent(self):
+        self.select(self.K.select_parent_press,self.M.select_parent_click,"选择父母",self.confirm_prob)()
+
+    def hatch(self,count):
+        self.hatch_0(count)
+        self.hatch_1(count)
+
+    @Actor.hangup
+    def confirm_hatch_egg(self):
+        self.select(self.K.confirm_hatch_egg_press,self.M.confirm_hatch_egg_click,"确认孵蛋",self.confirm_prob)()
+
+    @Actor.hangup
+    def hatch_egg_button(self):
+        self.M.hatch_egg_button_click()
+
+
+

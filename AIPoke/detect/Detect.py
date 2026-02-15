@@ -65,6 +65,18 @@ class Detect:
         """检测是否出现聊天提示框"""
         return all_white_pix(frame,self.rio["chat_win"])
 
+    def det_hatch_egg_button(self,frame):
+        """检测是否出现孵蛋按钮"""
+        return match_dynamic(frame,self.rio["hatch_egg_button"],tem_dict["hatch_egg_button"])
+
+    def det_computer_box(self,frame):
+        """检测是否出现电脑箱子"""
+        return match_static(frame,self.rio["computer_box"],tem_dict["computer_box"])
+
+    def det_select_parent(self,frame):
+        """检测是否出现选择父母界面"""
+        return match_static(frame,self.rio["select_parent"],tem_dict["select_parent"])
+
 
     def det_obs(self, frame, directions):
         """
@@ -147,17 +159,15 @@ class Detect:
 
 
 #
-# detect = Detect()
-# from AIPoke.image.Camera import Camera
-# import time
-# camera = Camera()
-# while True:
-#     frame = camera.grab()
-#     left_obs, right_obs = detect.det_obs_optical_flow(frame,["left","right"])
-#     if left_obs or right_obs:
-#         print("left_obs:",left_obs,"right_obs:",right_obs)
-#     # print(detect.det_underpass_obs(frame))
-#     time.sleep(0.1)
+detect = Detect()
+from AIPoke.image.Camera import Camera
+import time
+camera = Camera()
+while True:
+    frame = camera.grab()
+    flag = detect.det_select_parent(frame)
+    print(flag)
+    time.sleep(0.1)
 
 
 

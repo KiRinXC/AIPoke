@@ -1,21 +1,21 @@
 import cv2
-import numpy as np
-# frame = cv2.imread('2025-4-9-19-21.png')
-frame = cv2.imread('full_image.png')
+from Camera import Camera
+from get_tem import get_tem
+camera = Camera()
+frame = camera.grab()
 
-# 1. 设定区域（左上角 x,y 和宽高）
-x, y, w, h = 100, 500, 10, 10
+# 截屏
+# cv2.imwrite('frame.png', frame)
 
-# 2. 画红线框（BGR 顺序，红=0,0,255）
-# cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
 
-# 3. 直接切片取出这块区域
-roi = frame[y:y+h, x:x+w]
+# # 截取一个区域
+# x, y, w, h = 164,158,8,8
+# roi = frame[y:y+h, x:x+w]
+# cv2.imwrite('roi.png', roi)
+#
+# # 截取模板
+region = [249,150,26,15]
+template = get_tem(frame, region)
+cv2.imwrite('select_parent.png', template)
 
-# 想看结果
-# cv2.imshow('frame', frame)
-cv2.imshow('roi', roi)
-cc = np.max(roi, axis=-1)
-print(cc)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+

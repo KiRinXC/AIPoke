@@ -99,3 +99,35 @@ class MInfoWin(Mouse):
         self.click(self.chat_win)
 
 
+class MBox(Mouse):
+    def __init__(self):
+        super().__init__()
+        self.first_pokemon_in_box = self.rio["first_pokemon_in_box"]
+        self.box_spacing = self.rio["box_spacing"]
+        self.hatch_grid = self.rio["hatch_grid"]
+        self.hatch_egg_button = self.rio["hatch_egg_button"]
+        self.confirm_hatch_egg = self.rio["confirm_hatch_egg"]
+        self.select_parent = self.rio["select_parent"]
+
+    def select_pokemon_click(self,count,switch,button='left'):
+        row = count / 10
+        column = count % 10
+        x = self.first_pokemon_in_box[0]+ column * self.box_spacing[0]
+        y = self.first_pokemon_in_box[1]+ (row + switch * 3) * self.box_spacing[1]
+        rio = [x,y,self.first_pokemon_in_box[2],self.first_pokemon_in_box[3]]
+        self.click(rio,button)
+
+    def select_parent_click(self):
+
+
+    def select_hatch_click(self):
+        position = pydirectinput.position()
+        roi = [position[0]+self.hatch_grid[0],position[1]+self.hatch_grid[1],self.hatch_grid[2],self.hatch_grid[3]]
+        self.click(roi)
+
+    def hatch_egg_button_click(self):
+        self.click(self.hatch_egg_button)
+
+    def confirm_hatch_egg_click(self):
+        self.click(self.confirm_hatch_egg)
+

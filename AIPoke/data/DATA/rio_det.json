@@ -15,5 +15,8 @@
     "pokedex": [517,340,19,18],
     "underpass_left_obs": [502,401,44,44],
     "underpass_right_obs": [614,422,44,44],
-    "chat_win": [520,70,60,5]
+    "chat_win": [520,70,60,5],
+    "hatch_egg_button": [730,564,156,54],
+    "computer_box": [51,127,57,15],
+    "select_parent": [249,150,26,15]
 }

@@ -119,5 +119,17 @@ class KInfoWin(Key):
         self.press(self.chat_win)
 
 
+class KBox(Key):
+    def __init__(self):
+        super().__init__()
 
+    def select_parent_press(self):
+        self.press(self.A)
+
+    def select_hatch_press(self):
+        self.press(self.A)
+        self.press(self.A)
+
+    def confirm_hatch_egg_press(self):
+        self.press(self.A)
 

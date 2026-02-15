@@ -14,5 +14,11 @@
   "pokeball": [680,8,36,36],
   "iv": [375,302,13,19],
   "pokedex_cancel": [779,306,11,11],
-  "chat_win": [281,67,538,106]
+  "chat_win": [281,67,538,106],
+  "first_pokemon_in_box": [364,343,54,44],
+  "box_spacing":[63,53],
+  "hatch_grid": [6,6,83,24],
+  "hatch_egg_button": [730,564,156,54],
+  "confirm_hatch_egg": [466,371,167,99],
+  "select_parent": [271,181,42,42]
 }

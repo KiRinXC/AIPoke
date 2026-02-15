@@ -2,7 +2,7 @@ from collections import deque
 import logging
 import threading
 
-from AIPoke.actor.Actor import AOptions,ABar,AInfoWin
+from AIPoke.actor.Actor import AOptions,ABar,AInfoWin,ABox
 from AIPoke.image.Camera import Camera
 from AIPoke.detect.Detect import Detect
 from AIPoke.utili.reminder import Reminder
@@ -13,6 +13,7 @@ class AIPoke:
         self.options = AOptions()
         self.bar = ABar()
         self.infowin = AInfoWin()
+        self.box = ABox()
         self.reminder = Reminder()
         self.detector = Detect()
         self.camera = Camera()
