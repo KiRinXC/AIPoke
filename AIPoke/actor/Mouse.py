@@ -118,7 +118,7 @@ class MBox(Mouse):
         self.click(rio,button)
 
     def select_parent_click(self):
-
+        self.click(self.select_parent)
 
     def select_hatch_click(self):
         position = pydirectinput.position()

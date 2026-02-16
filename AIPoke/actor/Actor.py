@@ -3,8 +3,6 @@ import random
 import functools
 import time
 
-from flet.controls.material import switch
-from pywin.dialogs.ideoptions import buttonControlMap
 
 from AIPoke.actor.Key import KOptions, KBar, KInfoWin, KBox
 from AIPoke.actor.Mouse import MOptions, MBar, MInfoWin, MBox
@@ -185,11 +183,11 @@ class ABox(Actor):
         self.M.select_pokemon_click(count, switch, button)
         self.M.select_hatch_click()
 
-    @Actor.hangup
+
     def hatch_0(self,count):
         self.select(self.K_hatch,self.M_hatch,"选中上栏精灵",self.hatch_prob)(count,0)
 
-    @Actor.hangup
+
     def hatch_1(self,count):
         self.select(self.K_hatch,self.M_hatch,"选中下栏精灵",self.hatch_prob)(count,1)
 
@@ -198,17 +196,25 @@ class ABox(Actor):
     def select_parent(self):
         self.select(self.K.select_parent_press,self.M.select_parent_click,"选择父母",self.confirm_prob)()
 
+    @Actor.hangup
     def hatch(self,count):
+        self.M.random_drift_prob = -1.0
         self.hatch_0(count)
         self.hatch_1(count)
+        self.M.random_drift_prob = self.M.rio["random_drift_prob"]
 
-    @Actor.hangup
-    def confirm_hatch_egg(self):
-        self.select(self.K.confirm_hatch_egg_press,self.M.confirm_hatch_egg_click,"确认孵蛋",self.confirm_prob)()
 
     @Actor.hangup
     def hatch_egg_button(self):
+        self.M.random_drift_prob = -1.0
         self.M.hatch_egg_button_click()
+        self.M.random_drift_prob = self.M.rio["random_drift_prob"]
+
+
+    def confirm_hatch_egg(self):
+        self.select(self.K.confirm_hatch_egg_press,self.M.confirm_hatch_egg_click,"确认孵蛋",self.confirm_prob)()
+
+
 
 
 

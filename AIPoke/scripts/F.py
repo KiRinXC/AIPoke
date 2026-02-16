@@ -42,9 +42,9 @@ class F(AIPoke):
         while not self.quit_event.is_set():
             frame = self.camera.grab()
             state,is_nickname = self.update_state(frame)
-
+            print(bin(state),is_nickname)
             # 如果是脱战状态 (在野外)
-            if state == StateMap.PASS_ANIM:
+            if state == StateMap.PASS_ANIM and not is_nickname:
                 # 动画中不做任何事
                 pass
             # 进行对话
@@ -63,13 +63,14 @@ class F(AIPoke):
                     break
                 self.box.hatch(count)
                 count+=1
+                time.sleep(1)
 
             elif state == StateMap.HATCH:
-                self.box.select_hatch()
+                self.box.hatch_egg_button()
+                self.box.confirm_hatch_egg()
 
             elif is_nickname:
                 self.infowin.open_chat()
-
             else:
                 self.reminder.send_alert_remind("未知错误")
             time.sleep(0.1)

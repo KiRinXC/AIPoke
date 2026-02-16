@@ -38,7 +38,7 @@ def match_dynamic(frame, region, template, threshold=240,confidence=0.85):
     # 核心算法：标准模板匹配
     res = cv2.matchTemplate(binary_roi, template, cv2.TM_CCOEFF_NORMED)
     _, max_val, _, _ = cv2.minMaxLoc(res)
-
+    print("max_val:", max_val)
     return max_val >= confidence
 
 

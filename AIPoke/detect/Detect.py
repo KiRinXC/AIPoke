@@ -75,7 +75,7 @@ class Detect:
 
     def det_select_parent(self,frame):
         """检测是否出现选择父母界面"""
-        return match_static(frame,self.rio["select_parent"],tem_dict["select_parent"])
+        return match_dynamic(frame,self.rio["select_parent"],tem_dict["select_parent"],confidence=0.30)
 
 
     def det_obs(self, frame, directions):
@@ -158,16 +158,16 @@ class Detect:
 
 
 
-#
-detect = Detect()
-from AIPoke.image.Camera import Camera
-import time
-camera = Camera()
-while True:
-    frame = camera.grab()
-    flag = detect.det_select_parent(frame)
-    print(flag)
-    time.sleep(0.1)
+# #
+# detect = Detect()
+# from AIPoke.image.Camera import Camera
+# import time
+# camera = Camera()
+# while True:
+#     frame = camera.grab()
+#     flag = detect.det_select_parent(frame)
+#     print(flag)
+#     time.sleep(0.1)
 
 
 
