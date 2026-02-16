@@ -3,6 +3,7 @@ import pydirectinput
 
 from AIPoke.actor.Point import Point
 from AIPoke.actor.Random import Random
+from AIPoke.image.Camera import Camera
 from AIPoke.utili.data_manager import RIO_MOUSE
 # ================= 全局配置 =================
 pydirectinput.PAUSE = 0.0
@@ -110,12 +111,13 @@ class MBox(Mouse):
         self.select_parent = self.rio["select_parent"]
 
     def select_pokemon_click(self,count,switch,button='left'):
-        row = count / 10
+        row = count // 10
         column = count % 10
         x = self.first_pokemon_in_box[0]+ column * self.box_spacing[0]
         y = self.first_pokemon_in_box[1]+ (row + switch * 3) * self.box_spacing[1]
         rio = [x,y,self.first_pokemon_in_box[2],self.first_pokemon_in_box[3]]
         self.click(rio,button)
+
 
     def select_parent_click(self):
         self.click(self.select_parent)
@@ -123,7 +125,9 @@ class MBox(Mouse):
     def select_hatch_click(self):
         position = pydirectinput.position()
         roi = [position[0]+self.hatch_grid[0],position[1]+self.hatch_grid[1],self.hatch_grid[2],self.hatch_grid[3]]
+        self.random_drift_prob = -1.0
         self.click(roi)
+        self.random_drift_prob = self.rio["random_drift_prob"]
 
     def hatch_egg_button_click(self):
         self.click(self.hatch_egg_button)
@@ -131,3 +135,75 @@ class MBox(Mouse):
     def confirm_hatch_egg_click(self):
         self.click(self.confirm_hatch_egg)
 
+
+
+# import cv2
+# import numpy as np
+#
+#
+# def draw_pokemon_boxes(frame, mbox):
+#     """
+#     在图像上绘制所有宝可梦位置的红框
+#     """
+#     # 复制原图以避免修改原图
+#     img_with_boxes = frame.copy()
+#
+#     # 绘制30个第一排宝可梦的位置
+#     for i in range(30):
+#         rio_1 = mbox.select_pokemon_click(i, 0)
+#         draw_single_box(img_with_boxes, rio_1, f"P1-{i}")
+#
+#     # 绘制30个第二排宝可梦的位置
+#     for i in range(30):
+#         rio_2 = mbox.select_pokemon_click(i, 1)
+#         draw_single_box(img_with_boxes, rio_2, f"P2-{i}")
+#
+#     return img_with_boxes
+#
+#
+# def draw_single_box(img, rio, label=""):
+#     """
+#     绘制单个矩形框
+#     rio格式: [x, y, width, height]
+#     """
+#     x, y, w, h = map(int, rio[:4])  # 确保坐标是整数
+#
+#     # 绘制红色矩形框 (BGR格式，红色是(0,0,255))
+#     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+#
+#     # 可选：添加标签
+#     if label:
+#         cv2.putText(img, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+#                     0.5, (0, 0, 255), 1, cv2.LINE_AA)
+#
+#
+# def save_and_display_boxes(frame, mbox, output_path="pokemon_boxes.png"):
+#     """
+#     保存并显示带有框的图像
+#     """
+#     # 绘制所有框
+#     result_img = draw_pokemon_boxes(frame, mbox)
+#
+#     # 保存图像
+#     cv2.imwrite(output_path, result_img)
+#     print(f"图像已保存到: {output_path}")
+#
+#     # 显示图像（可选）
+#     cv2.imshow("Pokemon Boxes", result_img)
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
+#
+#     return result_img
+#
+#
+# # 使用示例
+# if __name__ == "__main__":
+#     # 创建对象
+#     mbox = MBox()
+#     camera = Camera()
+#
+#     # 获取一帧图像
+#     frame = camera.grab()
+#
+#     # 绘制所有框并保存
+#     result_image = save_and_display_boxes(frame, mbox, "pokemon_boxes_60.png")

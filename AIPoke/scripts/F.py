@@ -37,7 +37,7 @@ class F(AIPoke):
 
     def run(self):
         """主循环"""
-        count = 0
+        count = 1
         box_num = 0
         while not self.quit_event.is_set():
             frame = self.camera.grab()

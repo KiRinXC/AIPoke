@@ -180,8 +180,10 @@ class ABox(Actor):
         self.K.select_hatch_press()
 
     def M_hatch(self,count,switch,button = "right"):
+        self.M.shake_drift_prob = -1.0
         self.M.select_pokemon_click(count, switch, button)
         self.M.select_hatch_click()
+        self.M.shake_drift_prob = self.M.rio["shake_drift_prob"]
 
 
     def hatch_0(self,count):
